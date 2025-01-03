@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Supermarket OOP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        font-family: "Plus Jakarta Sans", serif;
+      }
+      header {
+        background: #35424a;
+        color: #ffffff;
+        padding: 1rem 0;
+        text-align: center;
+      }
+      button {
+        background-color: #5cb85c;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #4cae4c;
+      }
+      .toast {
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #5cb85c;
+        color: white;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 1;
+        left: 50%;
+        bottom: 30px;
+        font-size: 17px;
+        transition: visibility 0s, opacity 0.5s linear;
+      }
+      .toast.show {
+        visibility: visible;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body
+    class="dark:bg-[#212121] dark:text-white absolute inset-0 -z-10 h-full w-full dark:bg-[linear-gradient(to_right,#2b2b2b_1px,transparent_1px),linear-gradient(to_bottom,#2b2b2b_1px,transparent_1px)] bg-[size:55px_55px] flex items-center"
+  >
+    <nav
+      class="fixed bottom-6 right-0 left-0 flex justify-center shadow-lg lg:space-x-3 space-x-2"
+    >
+      <div
+        class="fixed bottom-4 bg-[#121212] flex justify-center items-center p-2 rounded-xl text-center font-light gap-x-2 cursor-pointer text-[#eaeaea]"
+      >
+        <button
+          onclick="setRole('pembeli')"
+          class="hidden lg:block p-[12px] border-[0.5px] border-[#212121] hover:border-[#f4f4f4] rounded-lg"
+        >
+          Pembeli
+        </button>
+        <button
+          onclick="setRole('pegawai')"
+          class="p-[12px] border-[0.5px] border-[#212121] hover:border-[#f4f4f4] rounded-lg"
+        >
+          Pegawai
+        </button>
+        <button
+          onclick="setRole('manajer')"
+          class="p-[12px] border-[0.5px] border-[#212121] hover:border-[#f4f4f4] rounded-lg"
+        >
+          Manajer
+        </button>
+      </div>
+    </nav>
+    <div class="w-full">
+      <div
+        id="output-pembeli"
+        class="flex w-max overflow-x-auto px-20 space-x-6"
+      ></div>
+      <div
+        id="output-pegawai"
+        class="flex flex-col justify-center items-center p-40 space-y-6"
+      ></div>
+      <div id="output-manajer" class="flex justify-center items-center"></div>
+    </div>
+    <div id="toast" class="toast">Pembelian berhasil!</div>
+    <script>
+      // Data produk
+      const products = [
+        {
+          id: 1,
+          name: "jeruk",
+          description: "desc",
+          price: 100000,
+          image: "jeruk.png",
+          category: "makanan",
+          stock: 100,
+          diskon: 0,
+        },
+        {
+          id: 2,
+          name: "lemon",
+          description: "desc",
+          price: 20000,
+          image: "lemon.png",
+          category: "makanan",
+          stock: 50,
+          diskon: 10,
+        },
+        {
+          id: 3,
+          name: "melon",
+          description: "desc",
+          price: 10000,
+          image: "melon.png",
+          category: "makanan",
+          stock: 10,
+          diskon: 5,
+        },
+        {
+          id: 4,
+          name: "nanas",
+          description: "desc",
+          price: 20000,
+          image: "nanas.png",
+          category: "makanan",
+          stock: 100,
+          diskon: 0,
+        },
+        {
+          id: 5,
+          name: "sepatu",
+          description: "desc",
+          price: 2000000,
+          image: "adidas men 1.png",
+          category: "fashion",
+          stock: 10,
+          diskon: 15,
+        },
+        {
+          id: 6,
+          name: "sendal",
+          description: "desc",
+          price: 500000,
+          image: "adidas men 2.png",
+          category: "fashion",
+          stock: 10,
+          diskon: 20,
+        },
+        {
+          id: 7,
+          name: "sepatu bola",
+          description: "desc",
+          price: 1500000,
+          image: "adidas men 3.png",
+          category: "fashion",
+          stock: 5,
+          diskon: 0,
+        },
+        {
+          id: 8,
+          name: "sendal",
+          description: "desc",
+          price: 200000,
+          image: "adidas women 2.png",
+          category: "fashion",
+          stock: 20,
+          diskon: 10,
+        },
+        {
+          id: 9,
+          name: "baju",
+          description: "desc",
+          price: 500000,
+          image: "zara men 3.png",
+          category: "fashion",
+          stock: 10,
+          diskon: 5,
+        },
+        {
+          id: 10,
+          name: "kemeja",
+          description: "a",
+          price: 400000,
+          image: "uniqlo men 1.png",
+          category: "fashion",
+          stock: 20,
+          diskon: 10,
+        },
+        {
+          id: 11,
+          name: "kemeja",
+          description: "a",
+          price: 500000,
+          image: "uniqlo men 2.png",
+          category: "fashion",
+          stock: 20,
+          diskon: 15,
+        },
+        {
+          id: 12,
+          name: "kemeja",
+          description: "a",
+          price: 500000,
+          image: "uniqlo men 3.png",
+          category: "fashion",
+          stock: 29,
+          diskon: 0,
+        },
+      ];
+
+      // Superclass Supermarket
+      class Supermarket {
+        static totalPenjualan = 0;
+
+        // Encapsulation: methode untuk menampilkan produk
+        static showItems() {
+          let output = "";
+          products.forEach((product) => {
+            output += `
+              <div class="p-6">
+                <p class="text-right">${product.diskon}% OFF</p>
+                <img src="${product.image}" alt="${product.name}" class="w-48 h-48 mx-auto object-cover">
+                <h1 class="text-5xl font-bold capitalize text-center my-8">${product.name}</h1>
+                <p>Harga: Rp${product.price}</p>
+                <div class="flex justify-between">
+                  <p>Stok: ${product.stock}</p>
+                  <input type="number" id="jumlah-${product.id}" min="1" max="${product.stock}" value="1" class="text-black font-bold text-center">
+                </div>
+                <button class="flex justify-center items-center space-x-2 py-3 w-full bg-[#A3E636] text-black text-xl font-bold rounded-md shadow-[6px_6px_0px_rgba(0,0,0,0.9)] hover:shadow-inner hover:translate-x-1 hover:translate-y-1 transition-all border-2 border-black mt-8" onclick="kasir.transaksi(${product.id}, document.getElementById('jumlah-${product.id}').value)">
+                  <span>Beli</span>
+              </button>
+              </div>
+            `;
+          });
+          document.getElementById("output-pembeli").innerHTML = output;
+        }
+      }
+
+      // Subclass Kasir
+      class Kasir extends Supermarket {
+        constructor() {
+          super();
+          this.totalBelanja = 0;
+          this.keranjang = [];
+        }
+
+        transaksi(id, jumlah) {
+          jumlah = parseInt(jumlah);
+          const product = products.find((p) => p.id === id);
+          if (product) {
+            if (product.stock >= jumlah) {
+              // Hitung harga setelah diskon
+              const diskonAmount = (product.price * product.diskon) / 100;
+              const hargaSetelahDiskon = product.price - diskonAmount;
+              const totalHarga = hargaSetelahDiskon * jumlah;
+
+              product.stock -= jumlah;
+              this.totalBelanja += totalHarga;
+              this.keranjang.push({ ...product, jumlah, totalHarga });
+              Supermarket.totalPenjualan += totalHarga;
+              this.showToast("Pembelian berhasil!");
+              document.getElementById(
+                "output-pembeli"
+              ).innerHTML = `${jumlah} ${product.name} berhasil dibeli dengan diskon ${product.diskon}%. Total: Rp${totalHarga}`;
+            } else {
+              document.getElementById(
+                "output-pembeli"
+              ).innerHTML = `Stok ${product.name} tidak mencukupi. Stok saat ini: ${product.stock}`;
+            }
+          } else {
+            document.getElementById(
+              "output-pembeli"
+            ).innerHTML = `Item tidak ditemukan.`;
+          }
+        }
+
+        showToast(message) {
+          const toast = document.getElementById("toast");
+          toast.innerHTML = message;
+          toast.class = "toast show";
+          setTimeout(() => {
+            toast.class = toast.class.replace("show", "");
+          }, 3000);
+        }
+      }
+
+      // Subclass Pegawai
+      class Pegawai extends Supermarket {
+        // Polimorphism
+        tambahStok() {
+          let output = `<h3>Tambah Stok Barang</h3>`;
+          products.forEach((product) => {
+            output += `
+              <div class="p-6 w-1/2 flex justify-between bg-[#A3E636] dark:bg-[#A388EE] text-black dark:text-black text-xl font-bold rounded-md shadow-[6px_6px_0px_rgba(0,0,0,0.9)] border-2 border-black">
+                <label class="capitalize">${product.name}</label>
+                <input class="text-black font-bold text-center" type="number" id="stok-${product.id}" min="1" max="100" value="1">
+                <button onclick="pegawai.updateStok(${product.id})">Tambah Stok</button>
+              </div>
+            `;
+          });
+          document.getElementById("output-pegawai").innerHTML = output;
+        }
+
+        updateStok(id) {
+          const product = products.find((p) => p.id === id);
+          const jumlah = parseInt(document.getElementById(`stok-${id}`).value);
+          if (product && jumlah > 0) {
+            product.stock += jumlah;
+            document.getElementById(
+              "output-pegawai"
+            ).innerHTML = `${jumlah} ${product.name} berhasil ditambahkan ke stok. Stok baru: ${product.stock}`;
+          }
+        }
+      }
+
+      // Subclass Manajer
+      class Manajer extends Supermarket {
+        totalPenjualan() {
+          document.getElementById(
+            "output-manajer"
+          ).innerHTML = `Total Penjualan: Rp${Supermarket.totalPenjualan}`;
+        }
+      }
+
+      let kasir = new Kasir();
+      let pegawai = new Pegawai();
+      let manajer = new Manajer();
+
+      function setRole(role) {
+        document.getElementById("output-pembeli").classList.add("hidden");
+        document.getElementById("output-pegawai").classList.add("hidden");
+        document.getElementById("output-manajer").classList.add("hidden");
+
+        if (role === "pembeli") {
+          document.getElementById("output-pembeli").classList.remove("hidden");
+          Supermarket.showItems();
+        } else if (role === "pegawai") {
+          document.getElementById("output-pegawai").classList.remove("hidden");
+          pegawai.tambahStok();
+        } else if (role === "manajer") {
+          document.getElementById("output-manajer").classList.remove("hidden");
+          manajer.totalPenjualan();
+        }
+      }
+
+      function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast show";
+        setTimeout(() => {
+          toast.className = "toast";
+        }, 3000);
+      }
+
+      function updateStok(id) {
+        const input = document.getElementById(`tambah-${id}`);
+        const tambahan = parseInt(input.value);
+        const product = products.find((p) => p.id === id);
+        if (product && tambahan > 0) {
+          product.stock += tambahan;
+          pegawai.tambahStok();
+          showToast("Stok berhasil ditambahkan!");
+        } else {
+          showToast("Input tidak valid!");
+        }
+      }
+    </script>
+  </body>
+</html>
